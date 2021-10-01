@@ -4,17 +4,13 @@ include env.$(ENVIRONMENT).mk
 .DEFAULT_GOAL := help
 
 .PHONY: all
-all: switch-kubectl-context deploy-all
-
-.PHONY: switch-kubectl-context
-switch-kubectl-context: ## Set kubectl context based on the KUBE_CONTEXT environment variable, by default it is defined in the `env.<ENVIRONMENT>.mk` file
-	kubectl config use-context $(KUBE_CONTEXT)
+all: deploy-all
 
 .PHONY: deploy-all
 deploy-all: $(foreach app,$(APPS),deploy-$(app)) ## Deploy all application to a given environment
 
 .PHONY: deploy-%
-deploy-%: switch-kubectl-context ## Deploy a single application to a given environment
+deploy-%: ## Deploy a single application to a given environment
 	$(MAKE) -C $* -e ENVIRONMENT=$(ENVIRONMENT) deploy
 
 .PHONY: help

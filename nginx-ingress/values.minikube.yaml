@@ -1,3 +1,0 @@
-## nginx-ingress configuration for the minikube environment
-## This file inherit from values.common.yaml
-## Ref: https://github.com/helm/charts/blob/master/stable/nginx-ingress/values.yaml
