@@ -1,4 +1,0 @@
-## external-dns configuration for the minikube environment
-## This file inherit from values.common.yaml
-## Ref: https://github.com/helm/charts/blob/master/stable/external-dns/values.yaml
-

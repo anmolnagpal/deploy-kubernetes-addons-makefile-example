@@ -2,16 +2,21 @@ include ../env.$(ENVIRONMENT).mk
 include ../common.mk
 
 # pull secret from Azure Keyvault
-CLOUDFLARE_EMAIL = $(shell $(SECRET_SHOW) cloudflare-email)
-CLOUDFLARE_API_KEY = $(shell $(SECRET_SHOW) cloudflare-api-key)
+ASSUME_ROLE_ARN = $(shell $(SECRET_SHOW) assume-role-arn)
+ZONE_TYPE = $(shell $(SECRET_SHOW) zone-type)
+REGION = $(shell $(SECRET_SHOW) region)
 
 # check for mandatory values, if not defined or something happen while pulling
 # it should fail
-ifeq ($(CLOUDFLARE_EMAIL),)
+ifeq ($(ASSUME_ROLE_ARN),)
   $(error CLOUDFLARE_EMAIL is not defined)
 endif
 
-ifeq ($(CLOUDFLARE_API_KEY),)
+ifeq ($(ZONE_TYPE),)
+  $(error CLOUDFLARE_API_KEY is not defined)
+endif
+
+ifeq ($(REGION),)
   $(error CLOUDFLARE_API_KEY is not defined)
 endif
 
@@ -23,6 +28,7 @@ deploy:
 		-i external-dns \
 		-f ./values.common.yaml \
 		-f ./values.$(ENVIRONMENT).yaml \
-		--set cloudflare.email=$(CLOUDFLARE_EMAIL) \
-		--set cloudflare.apiKey=$(CLOUDFLARE_API_KEY) \
-		stable/external-dns
+		--set aws.assumeRoleArn=$(ASSUME_ROLE_ARN) \
+		--set aws.zoneType=$(ZONE_TYPE) \
+		--set aws.region=$(REGION) \
+		bitnami/external-dns
