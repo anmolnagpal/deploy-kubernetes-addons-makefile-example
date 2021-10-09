@@ -32,3 +32,7 @@ deploy:
 		--set aws.zoneType=$(ZONE_TYPE) \
 		--set aws.region=$(REGION) \
 		bitnami/external-dns
+
+.PHONY: destroy
+destroy:
+	@helm uninstall external-dns -n kube-system

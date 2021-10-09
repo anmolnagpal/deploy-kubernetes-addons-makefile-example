@@ -10,10 +10,6 @@ version can be deployed to a given environment. Configuration can be shared
 accross environment. The steps to execute the deployment of an application are
 independant from each other which provide flexibility.
 
-> Bear in mind that you can adjust this framework to deploy components that are
-unrelated to Kubernetes, for example it can adjusted to apply a Terraform
-state.
-
 ## Overview
 
 Each application should be stored into its own directory. Each Makefile
@@ -32,49 +28,30 @@ directory.
 │   ├── README.md
 │   ├── values.common.yaml
 │   ├── values.development.yaml
-│   └── values.minikube.yaml
 │   └── values.production.yaml
-|
 ├── limit-ranges
-│   ├── Makefile
-|   |
-|   |       # Basic example of what the Makefile can look like to deploy some
-|   |       # Kubernetes configuration using kubectl
-|   |       include ../env.$(ENVIRONMENT).mk
-|   |       include ../common.mk
-|   |
-|   |       .PHONY: deploy
-|   |       deploy:
-|   |         kubectl apply -f ./$(ENVIRONMENT).yaml
-|   |
-|   |
-│   ├── README.md
 │   ├── development.yaml
-│   └── minikube.yaml
-│   └── production.yaml
-|
+│   ├── Makefile
+│   ├── production.yaml
+│   └── README.md
+├── Makefile
 ├── namespaces
-│   ├── Makefile
-│   ├── README.md
 │   ├── development.yaml
-│   ├── minikube.yaml
-│   └── production.yaml
-|
-├── nginx-ingress                       < Application directories
 │   ├── Makefile
-│   ├── README.md
-│   ├── values.common.yaml
-│   ├── values.development.yaml
-│   └── values.minikube.yaml
-│   └── values.production.yaml
-|
+│   ├── production.yaml
+│   └── README.md
+├── nginx-ingress
+│   ├── common.yaml
+│   ├── development.yaml
+│   ├── Makefile
+│   ├── production.yaml
+│   └── README.md
 ├── psp
 │   ├── common
 │   │   └── app-default.yaml
 │   ├── development
-│   ├── minikube
-│   ├── production
 │   ├── Makefile
+│   ├── production
 │   └── README.md
 ├── rbac
 │   ├── common
@@ -83,47 +60,14 @@ directory.
 │   │   ├── cicd-user.yaml
 │   │   ├── user-1.yaml
 │   │   └── user-2.yaml
-│   ├── minikube
-│   │   ├── cicd-user.yaml
-│   │   ├── user-1.yaml
-│   │   └── user-2.yaml
+│   ├── Makefile
 │   ├── production
 │   │   └── cicd-user.yaml
-│   ├── Makefile
 │   └── README.md
-|
-├── env.development.mk                  <  Environment files
-|
-|       # Basic example of what the env.development.mk could look like
-|       KUBE_CONTEXT = aks-development
-|
-|       # Azure Keyvault name where secrets are stored (ie: cloudflare password)
-|       AZURE_KEY_VAULT_NAME = my-infra
-|
-|       # Applications to deploy, order is important
-|       APPS = \
-|       	namespaces \
-|       	limit-ranges \
-|       	nginx-ingress \
-|       	external-dns \
-|       	psp \
-|       	rbac
-|
-|       # Ref: https://github.com/helm/charts/tree/master/stable/nginx-ingress
-|       NGINX_INGRESS_CHART_VERSION = 1.24.3
-|
-|       # Ref: https://github.com/helm/charts/blob/master/stable/external-dns
-|       EXTERNAL_DNS_CHART_VERSION = 2.6.4
-|
-|
-├── env.minikube.mk
-├── env.production.mk
-├── Makefile
-├── README.md
-└── common.mk                           < Common make functions/variables
-
-        # Example of re-usable function to pull secrets from keyvault
-        SECRET_SHOW := az keyvault secret show --vault-name $(AZURE_KEY_VAULT_NAME) --query 'value' -o tsv --name
+├── common.mk                    # Common environment variables which we need for all environments
+├── env.development.mk           # environment variables for development 
+├── env.production.mk            # environment variables for development 
+└── README.md
 ```
 
 - **Environment files** define what application and which version should be
@@ -140,16 +84,17 @@ local or test environment. In the following example, we use
 
 ```bash
 # display help
-$ ENVIRONMENT=minikube make help
-
-# start minikube
-$ minikube start
+$ ENVIRONMENT=development make help
 
 # deploy all applications to the development cluster
-$ ENVIRONMENT=minikube make deploy-all
+$ ENVIRONMENT=development make deploy-all
 
-# deploy a single application to the minikube cluster
-$ ENVIRONMENT=minikube make deploy-nginx-ingress
+# deploy a single application to the development cluster
+$ ENVIRONMENT=development make deploy-nginx-ingress
+
+# destroy all applications to the development cluster
+$ ENVIRONMENT=development make destroy-all
+
+# destroy a single application to the development cluster
+$ ENVIRONMENT=development make destroy-nginx-ingress
 ```
-
-[minikube]: https://github.com/kubernetes/minikube
